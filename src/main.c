@@ -1,6 +1,12 @@
 #include "lab.h"
+#include <arpa/inet.h>
+#include <netdb.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <string.h>
 
 #ifdef TEST
 #define main main_exclude
@@ -10,12 +16,6 @@
 
 int main(void)
 {
-    char *greeting = get_greeting("World");
-    if (greeting) {
-        printf("%s\n", greeting);
-        free(greeting); // Free the allocated memory for the greeting
-    } else {
-        printf("Failed to create greeting.\n");
-    }
+    open_close(2525, "ec2-54-148-3-55.us-west-2.compute.amazonaws.com", "Hello World");
     return 0;
 }
