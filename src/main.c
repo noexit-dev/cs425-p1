@@ -58,42 +58,29 @@ int main(int argc, char *argv[]) {
     char *port = DEFAULT_PORT;
     char *helo_host = DEFAULT_HELO;
     char *server = NULL;
+    
+    // Flag to track dynamic memory allocation
+    int is_body_allocated = 0;
 
     int opt;
-    // Parse options using getopt
     while ((opt = getopt(argc, argv, "f:t:s:b:p:H:")) != -1) {
         switch (opt) {
-            case 'f':
-                from = optarg;
-                break;
-            case 't':
-                to = optarg;
-                break;
-            case 's':
-                subject = optarg;
-                break;
-            case 'b':
-                body = optarg;
-                break;
-            case 'p':
-                port = optarg;
-                break;
-            case 'H':
-                helo_host = optarg;
-                break;
-            default:
-                print_usage(argv[0]);
+            case 'f': from = optarg; break;
+            case 't': to = optarg; break;
+            case 's': subject = optarg; break;
+            case 'b': body = optarg; break;
+            case 'p': port = optarg; break;
+            case 'H': helo_host = optarg; break;
+            default: print_usage(argv[0]);
         }
     }
 
-    // Validate mandatory parameters
     if (!from || !to) {
         fprintf(stderr, "Error: Both -f <from> and -t <to> are required.\n\n");
         print_usage(argv[0]);
         return 0;
     }
 
-    // Check for the mandatory positional argument <server>
     if (optind < argc) {
         server = argv[optind];
     } else {
@@ -102,12 +89,12 @@ int main(int argc, char *argv[]) {
         return 0;
     }
 
-    // If body (-b) was not provided, read from stdin (supports pipes)
+    // If body (-b) was not provided, read from stdin and set allocation flag
     if (!body) {
         body = read_stdin_to_string();
+        is_body_allocated = 1;
     }
 
-    // --- Demonstration of parsed values ---
     printf("--- Configuration Parsed Successfully ---\n");
     printf("Server:    %s\n", server);
     printf("Port:      %s\n", port);
@@ -121,6 +108,12 @@ int main(int argc, char *argv[]) {
     int res = smtp_protcol(from, to, subject, body, (short unsigned int)atoi(port), helo_host, server);
 
     printf("--- SMTP Protocol Executed Successfully ---\n\n");
+    
+    // Memory Cleanup: Free body if it was dynamically allocated
+    if (is_body_allocated) {
+        free(body);
+    }
+    
     res == 1 ? res++ : res;
     return res;
 }

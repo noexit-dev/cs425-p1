@@ -107,7 +107,7 @@ _all-text: test debug-test
 
 leak:
 	@if [[ -e ./build/debug/$(APP_NAME)_d ]]; then \
-		ASAN_OPTIONS="detect_leaks=1" ./build/debug/$(APP_NAME)_d; \
+		ASAN_OPTIONS="detect_leaks=1" ./build/debug/$(APP_NAME)_d -f dummy@example.com -t dummy@example.com -b "Test body" 127.0.0.1 || true; \
 	else \
 		echo "Build the debug target first by running 'make debug'."; \
 		exit 1; \
